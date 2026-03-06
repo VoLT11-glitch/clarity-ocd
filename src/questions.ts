@@ -3,84 +3,84 @@ import { Question } from './types';
 export const questions: Question[] = [
   {
     id: 1,
-    text: "Do you experience unwanted thoughts, images, or urges that repeatedly enter your mind even when you try to ignore them?",
+    text: "Do you ever get thoughts that pop into your head and feel really hard to shake—even when you’re trying to move on with your day?",
     options: [
-      { text: "Not at all", score: 0 },
-      { text: "Occasionally", score: 1 },
-      { text: "Frequently", score: 2 },
-      { text: "Almost constantly", score: 3 }
-    ]
+      { text: "Not really", score: 0 },
+      { text: "Once in a while", score: 1 },
+      { text: "Pretty often", score: 2 },
+      { text: "Almost all the time", score: 3 },
+    ],
   },
   {
     id: 2,
-    text: "Do these thoughts cause you significant distress or anxiety?",
+    text: "When those thoughts show up, how much do they stress you out or make you anxious?",
     options: [
-      { text: "No distress", score: 0 },
-      { text: "Mild distress", score: 1 },
-      { text: "Moderate distress", score: 2 },
-      { text: "Severe distress", score: 3 }
-    ]
+      { text: "They don’t really bother me", score: 0 },
+      { text: "A little", score: 1 },
+      { text: "Quite a bit", score: 2 },
+      { text: "A lot (it can feel overwhelming)", score: 3 },
+    ],
   },
   {
     id: 3,
-    text: "Do you feel compelled to perform certain actions or mental rituals to reduce anxiety or prevent something bad from happening?",
+    text: "Do you ever feel like you have to do certain things to feel okay again—like checking, repeating, asking for reassurance, or going over something in your mind?",
     options: [
-      { text: "Never", score: 0 },
+      { text: "Nope", score: 0 },
       { text: "Sometimes", score: 1 },
       { text: "Often", score: 2 },
-      { text: "All the time", score: 3 }
-    ]
+      { text: "Most of the time", score: 3 },
+    ],
   },
   {
     id: 4,
-    text: "How much time do you spend each day on these thoughts or behaviors?",
+    text: "About how much time does this take up in a day—either the thoughts themselves, or the things you do to calm down or feel certain?",
     options: [
       { text: "Less than 30 minutes", score: 0 },
       { text: "30 minutes to 1 hour", score: 1 },
-      { text: "1-3 hours", score: 2 },
-      { text: "More than 3 hours", score: 3 }
-    ]
+      { text: "1–3 hours", score: 2 },
+      { text: "More than 3 hours", score: 3 },
+    ],
   },
   {
     id: 5,
-    text: "Do these thoughts or behaviors interfere with your daily life, work, or relationships?",
+    text: "Does this get in the way of your day—school/work, relationships, or just being able to relax and enjoy things?",
     options: [
       { text: "Not at all", score: 0 },
       { text: "A little", score: 1 },
       { text: "Quite a bit", score: 2 },
-      { text: "Severely", score: 3 }
-    ]
+      { text: "A lot", score: 3 },
+    ],
   },
   {
     id: 6,
-    text: "Do you recognize that these thoughts or behaviors are excessive or unreasonable?",
+    text: "When it’s happening, can you tell it might be more than the situation calls for—or does it feel completely necessary in the moment?",
     options: [
-      { text: "I don't have these issues", score: 0 },
-      { text: "Yes, completely", score: 2 },
-      { text: "Sometimes I realize it", score: 2 },
-      { text: "No, they feel completely rational", score: 1 }
-    ]
+      { text: "This doesn’t really happen for me", score: 0 },
+      { text: "Yeah, I can tell it’s more than the situation calls for", score: 2 },
+      { text: "Sometimes I can tell, sometimes I can’t", score: 2 },
+      { text: "In the moment it feels completely necessary", score: 1 },
+    ],
   },
   {
     id: 7,
-    text: "Do you avoid certain places, people, or situations because they trigger these thoughts or urges?",
+    text: "Do you ever avoid certain places, people, or situations because you worry it’ll set this off again?",
     options: [
       { text: "Never", score: 0 },
       { text: "Rarely", score: 1 },
       { text: "Often", score: 2 },
-      { text: "Almost always", score: 3 }
-    ]
+      { text: "Almost always", score: 3 },
+    ],
   },
   {
     id: 8,
-    text: "Do you struggle to stop these thoughts or resist performing these behaviors?",
+    text: "When a worry shows up, how hard is it to let it be there without doing something to get rid of the feeling?",
     options: [
-      { text: "Not applicable to me", score: 0 },
-      { text: "I can usually stop them", score: 1 },
-      { text: "It's very difficult to stop", score: 2 },
-      { text: "I feel I have no control", score: 3 }
-    ]
-  }
+      { text: "Not really an issue for me", score: 0 },
+      { text: "I can usually let it go", score: 1 },
+      { text: "It’s pretty hard", score: 2 },
+      { text: "It feels nearly impossible", score: 3 },
+    ],
+  },
 ];
 
 export function calculateResult(answers: number[]): { outcome: 'high' | 'possible' | 'unlikely'; totalScore: number } {
