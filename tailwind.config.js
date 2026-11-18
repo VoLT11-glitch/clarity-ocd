@@ -41,6 +41,10 @@ export default {
           '0%': { transform: 'translateX(-60%)' },
           '100%': { transform: 'translateX(120%)' },
         },
+        fadeUp: {
+          '0%': { transform: 'translateY(8px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
         pop: {
           '0%': { transform: 'scale(0.96)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
@@ -55,6 +59,7 @@ export default {
         bob: 'bob 2.2s ease-in-out infinite',
         bounceTiny: 'bounceTiny 220ms ease-out',
         shine: 'shine 1200ms ease-out infinite',
+        fadeUp: 'fadeUp 500ms ease-out both',
         pop: 'pop 180ms ease-out',
         confetti: 'confetti var(--confetti-duration, 1600ms) ease-in forwards',
       },

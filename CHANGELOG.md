@@ -2,6 +2,15 @@
 
 Newest first.
 
+## v1.3 · Warm landing redesign · 2026-11-18
+
+- New warm cream + plum look with a serif headline font (Fraunces) and one highlighted phrase in the hero
+- Hero now pairs the founder quote with a calm "tangle settles into a circle" illustration
+- New trust strip, 3-step "How it works", a no-score result preview card and a short FAQ
+- Header "Why I built this" link on larger screens; gentle fade-in only (respects reduced motion)
+- Share image (og-image.png, 1200x630) and large-card link previews for WhatsApp / X
+- Removed the unused Supabase dependency; package renamed to `clarityocd`
+
 ## v1.2 · Research-backed questions · 2026-11-18
 
 - Replaced the 8 questions with a set modelled on how clinicians screen (DSM-5, Y-BOCS, DOCS); original wording
