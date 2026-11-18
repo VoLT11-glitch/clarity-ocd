@@ -6,7 +6,7 @@ const POINTS = [
   {
     icon: ListChecks,
     title: '8 honest questions',
-    body: 'About thoughts that stick, the things you do to feel okay, and how much time it takes.',
+    body: 'About thoughts that stick and what you do about them, including the rituals in your head that most tests miss.',
   },
   {
     icon: MessageCircleHeart,

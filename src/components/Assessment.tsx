@@ -1,34 +1,48 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Check, ChevronRight } from 'lucide-react';
-import { questions } from '../questions';
+import { questions, type Answers } from '../questions';
 import Layout from './Layout';
 import { go } from '../router';
 
 interface AssessmentProps {
-  onComplete: (answers: number[]) => void;
+  onComplete: (answers: Answers) => void;
 }
+
+const isNone = (ids: string[] | undefined) => !ids || ids.length === 0 || (ids.length === 1 && ids[0] === 'none');
 
 export default function Assessment({ onComplete }: AssessmentProps) {
   const [current, setCurrent] = useState(0);
-  // Store the chosen option index per question, so going back keeps the answer.
-  const [picked, setPicked] = useState<(number | null)[]>(() => questions.map(() => null));
+  const [answers, setAnswers] = useState<Answers>({});
 
   const question = questions[current];
-  const selected = picked[current];
+  const selected = answers[question.id] ?? [];
+  const multi = question.kind === 'multi';
+  const hasAnswer = selected.length > 0;
   const isLast = current === questions.length - 1;
-  const progress = ((current + (selected !== null ? 1 : 0)) / questions.length) * 100;
+  const progress = ((current + (hasAnswer ? 1 : 0)) / questions.length) * 100;
 
-  const choose = (optionIndex: number) => {
-    setPicked((prev) => prev.map((v, i) => (i === current ? optionIndex : v)));
+  // If nothing in the first two questions applies, the severity questions
+  // don't make sense, so finish early.
+  const nothingApplies = current === 1 && isNone(answers.themes) && isNone(answers.rituals);
+
+  const choose = (optionId: string) => {
+    const option = question.options.find((o) => o.id === optionId)!;
+    setAnswers((prev) => {
+      const cur = prev[question.id] ?? [];
+      if (!multi) return { ...prev, [question.id]: [optionId] };
+      if (option.exclusive) return { ...prev, [question.id]: cur.includes(optionId) ? [] : [optionId] };
+      const withoutExclusive = cur.filter((id) => !question.options.find((o) => o.id === id)?.exclusive);
+      const next = withoutExclusive.includes(optionId)
+        ? withoutExclusive.filter((id) => id !== optionId)
+        : [...withoutExclusive, optionId];
+      return { ...prev, [question.id]: next };
+    });
   };
 
   const next = () => {
-    if (selected === null) return;
-    if (isLast) {
-      onComplete(picked.map((p, i) => questions[i].options[p ?? 0].score));
-    } else {
-      setCurrent((c) => c + 1);
-    }
+    if (!hasAnswer) return;
+    if (isLast || nothingApplies) onComplete(answers);
+    else setCurrent((c) => c + 1);
   };
 
   const back = () => {
@@ -36,12 +50,12 @@ export default function Assessment({ onComplete }: AssessmentProps) {
     else setCurrent((c) => c - 1);
   };
 
-  // Keyboard: 1–4 picks an answer, Enter moves on.
+  // Keyboard: number keys pick an answer, Enter moves on.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
-      if (n >= 1 && n <= question.options.length) choose(n - 1);
-      if (e.key === 'Enter' && selected !== null) next();
+      if (n >= 1 && n <= question.options.length) choose(question.options[n - 1].id);
+      if (e.key === 'Enter' && hasAnswer) next();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -76,23 +90,31 @@ export default function Assessment({ onComplete }: AssessmentProps) {
             <h1 id="q-text" className="text-2xl md:text-3xl font-bold text-brand-ink leading-[1.3]">
               {question.text}
             </h1>
+            {question.hint && <p className="mt-2 text-brand-ink/65">{question.hint}</p>}
 
-            <div className="mt-7 space-y-3" role="radiogroup" aria-labelledby="q-text">
-              {question.options.map((option, index) => {
-                const isSelected = selected === index;
+            <div
+              className="mt-6 space-y-3"
+              role={multi ? 'group' : 'radiogroup'}
+              aria-labelledby="q-text"
+            >
+              {question.options.map((option) => {
+                const isSelected = selected.includes(option.id);
                 return (
                   <button
-                    key={index}
-                    role="radio"
+                    key={option.id}
+                    role={multi ? 'checkbox' : 'radio'}
                     aria-checked={isSelected}
-                    onClick={() => choose(index)}
+                    onClick={() => choose(option.id)}
                     className={['answer-btn', isSelected ? 'answer-btn-selected' : ''].join(' ')}
                   >
                     <span className="flex items-center justify-between gap-4">
-                      <span className="text-lg text-brand-ink">{option.text}</span>
+                      <span className={['text-brand-ink', option.exclusive ? 'text-base text-brand-ink/75' : 'text-lg'].join(' ')}>
+                        {option.label}
+                      </span>
                       <span
                         className={[
-                          'grid h-8 w-8 shrink-0 place-items-center rounded-full border-2',
+                          'grid h-8 w-8 shrink-0 place-items-center border-2',
+                          multi ? 'rounded-lg' : 'rounded-full',
                           isSelected
                             ? 'border-brand-plum bg-brand-plum text-white'
                             : 'border-brand-ink/15 text-transparent',
@@ -109,14 +131,14 @@ export default function Assessment({ onComplete }: AssessmentProps) {
 
             <button
               onClick={next}
-              disabled={selected === null}
-              className={['btn-primary mt-7 w-full', selected === null ? 'btn-disabled' : ''].join(' ')}
+              disabled={!hasAnswer}
+              className={['btn-primary mt-7 w-full', !hasAnswer ? 'btn-disabled' : ''].join(' ')}
             >
-              {isLast ? 'See my result' : 'Next'}
+              {isLast || nothingApplies ? 'See my result' : 'Next'}
               <ChevronRight className="h-5 w-5" />
             </button>
             <p className="mt-3 text-center text-xs text-brand-ink/55">
-              Go with your first answer. There's no right one.
+              Think about the past month. Go with your first answer.
             </p>
           </div>
         </div>

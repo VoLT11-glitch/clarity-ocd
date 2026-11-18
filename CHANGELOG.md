@@ -2,6 +2,16 @@
 
 Newest first.
 
+## v1.2 · Research-backed questions · 2026-11-18
+
+- Replaced the 8 questions with a set modelled on how clinicians screen (DSM-5, Y-BOCS, DOCS); original wording
+- New: which OCD themes show up (contamination, harm, taboo thoughts, just-right, doubt, magical rules)
+- New: which rituals you do, including invisible ones (reassurance, mental reviewing, praying, avoiding)
+- 5 severity questions on a 0–4 scale: time, distress, interference, avoidance, difficulty resisting
+- New: "unwanted vs realistic worry" question to separate OCD from general anxiety
+- Insight no longer scored (it's a DSM-5 specifier, not severity)
+- Result names your themes and flags hidden compulsions; finishes early if nothing applies
+
 ## v1.1 · Calm redesign · 2026-11-18
 
 - Removed game mechanics (XP, confetti, "Finish & celebrate", streaks) that clash with an OCD check-in

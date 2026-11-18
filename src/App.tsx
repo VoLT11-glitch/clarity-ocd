@@ -5,13 +5,14 @@ import Results from './components/Results';
 import UrgeTimer from './components/UrgeTimer';
 import Story from './components/Story';
 import { go, readRoute, type Route } from './router';
+import type { Answers } from './questions';
 
-const ANSWERS_KEY = 'clarity_answers';
+const ANSWERS_KEY = 'clarity_answers_v2';
 
-function loadAnswers(): number[] | null {
+function loadAnswers(): Answers | null {
   try {
     const raw = sessionStorage.getItem(ANSWERS_KEY);
-    return raw ? (JSON.parse(raw) as number[]) : null;
+    return raw ? (JSON.parse(raw) as Answers) : null;
   } catch {
     return null;
   }
@@ -19,7 +20,7 @@ function loadAnswers(): number[] | null {
 
 function App() {
   const [route, setRoute] = useState<Route>(readRoute);
-  const [answers, setAnswers] = useState<number[] | null>(loadAnswers);
+  const [answers, setAnswers] = useState<Answers | null>(loadAnswers);
 
   useEffect(() => {
     const onHash = () => {
@@ -30,7 +31,7 @@ function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const handleComplete = (userAnswers: number[]) => {
+  const handleComplete = (userAnswers: Answers) => {
     setAnswers(userAnswers);
     try {
       sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(userAnswers));

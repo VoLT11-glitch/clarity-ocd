@@ -1,10 +1,15 @@
 import { ArrowRight, Hourglass } from 'lucide-react';
 import Layout, { Helplines } from './Layout';
-import { calculateResult } from '../questions';
+import { calculateResult, MENTAL_RITUALS, THEME_LABELS, type Answers } from '../questions';
 import { go } from '../router';
 
 interface ResultsProps {
-  answers: number[];
+  answers: Answers;
+}
+
+function listJoin(items: string[]) {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
 
 const OUTCOMES = {
@@ -49,8 +54,11 @@ const OUTCOMES = {
 } as const;
 
 export default function Results({ answers }: ResultsProps) {
-  const { outcome } = calculateResult(answers);
+  const { outcome, themes, rituals, fit } = calculateResult(answers);
   const config = OUTCOMES[outcome];
+  const themeText = listJoin(themes.map((t) => THEME_LABELS[t]));
+  const hasHiddenRituals = rituals.some((r) => MENTAL_RITUALS.includes(r));
+  const showPattern = outcome !== 'unlikely' && (themes.length > 0 || hasHiddenRituals || fit === 'realistic');
 
   return (
     <Layout footerHelplines={false}>
@@ -60,6 +68,29 @@ export default function Results({ answers }: ResultsProps) {
             <span className={['pill', config.badgeClass].join(' ')}>{config.badge}</span>
             <h1 className="mt-4 text-3xl md:text-4xl font-bold leading-tight text-brand-ink">{config.title}</h1>
             <p className="mt-4 text-lg leading-relaxed text-brand-ink/80">{config.description}</p>
+
+            {showPattern && (
+              <div className="mt-6 space-y-2 rounded-2xl bg-brand-lavender/50 p-5 text-brand-ink/85">
+                {themes.length > 0 && (
+                  <p>
+                    <strong className="text-brand-ink">What you described</strong> fits the {themeText}{' '}
+                    {themes.length === 1 ? 'theme' : 'themes'} of OCD. Worth naming when you talk to someone.
+                  </p>
+                )}
+                {hasHiddenRituals && (
+                  <p>
+                    Things like reassurance-seeking, replaying things in your head or avoiding triggers are compulsions
+                    too, even though nobody can see them.
+                  </p>
+                )}
+                {fit === 'realistic' && (
+                  <p>
+                    You said these feel like realistic worries about your life. That can point more toward anxiety than
+                    OCD, so mention it to whoever you speak to.
+                  </p>
+                )}
+              </div>
+            )}
 
             <h2 className="mt-8 text-xl font-bold text-brand-ink">What you can do next</h2>
             <ol className="mt-4 space-y-3">
