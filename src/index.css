@@ -13,7 +13,8 @@
   }
 
   body {
-    @apply bg-brand-cream text-brand-ink antialiased;
+    @apply text-brand-ink antialiased;
+    background-color: #FBF6EE;
     font-family:
       Nunito,
       ui-rounded,
@@ -32,7 +33,8 @@
   h2,
   h3 {
     font-family:
-      Fredoka,
+      Fraunces,
+      Georgia,
       Nunito,
       ui-rounded,
       system-ui,
@@ -41,7 +43,7 @@
       Roboto,
       'Helvetica Neue',
       Arial;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   ::selection {
@@ -52,11 +54,25 @@
 @layer components {
 .app-bg {
   background:
-    radial-gradient(1200px 500px at 15% 15%, rgba(110, 75, 232, 0.18), transparent 60%),
-    radial-gradient(900px 480px at 90% 25%, rgba(156, 120, 255, 0.15), transparent 55%),
-    radial-gradient(900px 520px at 65% 95%, rgba(60, 37, 99, 0.12), transparent 55%),
-    linear-gradient(180deg, rgba(245, 240, 255, 1), rgba(255, 252, 255, 1));
+    radial-gradient(900px 480px at 100% 0%, rgba(255, 183, 160, 0.28), transparent 60%),
+    radial-gradient(900px 520px at 0% 30%, rgba(190, 170, 255, 0.20), transparent 60%),
+    linear-gradient(180deg, #FBF6EE, #FFFCF8);
 }
+  .hl {
+    background: linear-gradient(transparent 52%, #FFD98A 52%, #FFD98A 94%, transparent 94%);
+    padding: 0 0.12em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .fade-up {
+    animation: fadeUp 500ms ease-out both;
+  }
+
+  .fade-up-2 {
+    animation: fadeUp 500ms ease-out 120ms both;
+  }
+
   .card {
     @apply rounded-bubble bg-white shadow-soft border border-white/60 backdrop-blur-sm;
   }
@@ -141,7 +157,9 @@
   @media (prefers-reduced-motion: reduce) {
     .btn,
     .answer-btn,
-    .progress-fill {
+    .progress-fill,
+    .fade-up,
+    .fade-up-2 {
       transition: none !important;
       animation: none !important;
     }
