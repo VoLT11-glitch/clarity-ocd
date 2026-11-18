@@ -56,9 +56,10 @@ export const questions: Question[] = [
     text: "When it’s happening, can you tell it might be more than the situation calls for—or does it feel completely necessary in the moment?",
     options: [
       { text: "This doesn’t really happen for me", score: 0 },
-      { text: "Yeah, I can tell it’s more than the situation calls for", score: 2 },
+      // Less insight = more severe (as in Y-BOCS item 11), so "completely necessary" scores highest.
+      { text: "Yeah, I can tell it’s more than the situation calls for", score: 1 },
       { text: "Sometimes I can tell, sometimes I can’t", score: 2 },
-      { text: "In the moment it feels completely necessary", score: 1 },
+      { text: "In the moment it feels completely necessary", score: 3 },
     ],
   },
   {

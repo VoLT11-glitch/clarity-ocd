@@ -1,53 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Landing from './components/Landing';
 import Assessment from './components/Assessment';
 import Results from './components/Results';
-import HabitTracker from './components/HabitTracker';
+import UrgeTimer from './components/UrgeTimer';
 import Story from './components/Story';
+import { go, readRoute, type Route } from './router';
 
-type Page = 'landing' | 'story' | 'assessment' | 'results' | 'habits';
+const ANSWERS_KEY = 'clarity_answers';
+
+function loadAnswers(): number[] | null {
+  try {
+    const raw = sessionStorage.getItem(ANSWERS_KEY);
+    return raw ? (JSON.parse(raw) as number[]) : null;
+  } catch {
+    return null;
+  }
+}
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('landing');
-  const [answers, setAnswers] = useState<number[]>([]);
+  const [route, setRoute] = useState<Route>(readRoute);
+  const [answers, setAnswers] = useState<number[] | null>(loadAnswers);
 
-  const handleStory = () => {
-    setCurrentPage('story');
-  };
-
-  const handleStart = () => {
-    setCurrentPage('assessment');
-  };
+  useEffect(() => {
+    const onHash = () => {
+      setRoute(readRoute());
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   const handleComplete = (userAnswers: number[]) => {
     setAnswers(userAnswers);
-    setCurrentPage('results');
+    try {
+      sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(userAnswers));
+    } catch {
+      /* private mode: result still shows for this visit */
+    }
+    go('result');
   };
 
-  const handleRestart = () => {
-    setAnswers([]);
-    setCurrentPage('landing');
-  };
-
-  const handleHabits = () => {
-    setCurrentPage('habits');
-  };
-
-  const handleBackFromHabits = () => {
-    setCurrentPage('results');
-  };
-
-  return (
-    <>
-      {currentPage === 'landing' && <Landing onStart={handleStart} onStory={handleStory} />}
-      {currentPage === 'story' && <Story onBack={() => setCurrentPage('landing')} />}
-      {currentPage === 'assessment' && <Assessment onComplete={handleComplete} />}
-      {currentPage === 'results' && (
-        <Results answers={answers} onRestart={handleRestart} onHabits={handleHabits} />
-      )}
-      {currentPage === 'habits' && <HabitTracker onBack={handleBackFromHabits} />}
-    </>
-  );
+  if (route === 'story') return <Story />;
+  if (route === 'check') return <Assessment onComplete={handleComplete} />;
+  if (route === 'pause') return <UrgeTimer />;
+  if (route === 'result') {
+    if (!answers) {
+      go('check');
+      return null;
+    }
+    return <Results answers={answers} />;
+  }
+  return <Landing />;
 }
 
 export default App;

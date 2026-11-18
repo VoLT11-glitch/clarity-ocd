@@ -1,13 +1,11 @@
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import Layout from './Layout';
+import { go } from '../router';
 
-interface StoryProps {
-  onBack: () => void;
-}
-
-export default function Story({ onBack }: StoryProps) {
+export default function Story() {
   return (
-    <div className="min-h-screen app-bg">
-      <div className="relative overflow-hidden px-4 py-10 md:py-16">
+    <Layout>
+      <div className="relative overflow-hidden px-4 py-10 md:py-14">
         <div
           className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full opacity-20"
           style={{ background: 'radial-gradient(circle, #6E4BE8 0%, transparent 70%)' }}
@@ -19,7 +17,7 @@ export default function Story({ onBack }: StoryProps) {
 
         <div className="mx-auto max-w-2xl relative z-10">
           <button
-            onClick={onBack}
+            onClick={() => go('home')}
             className="mb-10 inline-flex items-center gap-2 text-sm font-semibold text-brand-ink/60 transition hover:text-brand-ink"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -47,7 +45,7 @@ export default function Story({ onBack }: StoryProps) {
 
           <div className="space-y-6 text-brand-ink/80 text-lg leading-relaxed">
             <p>
-              Hey. Before you take this assessment, let me tell you why it exists.
+              Hey. Before you take the check-in, let me tell you why it exists.
             </p>
 
             <p>
@@ -112,13 +110,16 @@ export default function Story({ onBack }: StoryProps) {
           </div>
 
           <div className="mt-12 border-t border-brand-ink/10 pt-8">
-            <button onClick={onBack} className="btn-primary">
-              Back to ClarityOCD
-              <span aria-hidden>→</span>
+            <p className="mb-4 text-lg font-semibold text-brand-ink">
+              If any of this sounds familiar, start here.
+            </p>
+            <button onClick={() => go('check')} className="btn-primary">
+              Start the check-in
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
