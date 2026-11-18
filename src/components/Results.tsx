@@ -1,160 +1,142 @@
-import { AlertCircle, CheckCircle, Info, Sparkles } from 'lucide-react';
-import Confetti from './Confetti';
-import Mascot from './Mascot';
-import { calculateResult, questions } from '../questions';
+import { ArrowRight, Hourglass } from 'lucide-react';
+import Layout, { Helplines } from './Layout';
+import { calculateResult, MENTAL_RITUALS, THEME_LABELS, type Answers } from '../questions';
+import { go } from '../router';
 
 interface ResultsProps {
-  answers: number[];
-  onRestart: () => void;
-  onHabits?: () => void;
+  answers: Answers;
 }
 
-export default function Results({ answers, onRestart, onHabits }: ResultsProps) {
-  const { outcome, totalScore } = calculateResult(answers);
-  const maxScore = questions.length * 3;
-  const scorePct = Math.round((totalScore / maxScore) * 100);
+function listJoin(items: string[]) {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
 
-  const outcomeConfig = {
-    high: {
-      icon: AlertCircle,
-      iconColor: 'text-white',
-      badgeBg: 'bg-brand-coral',
-      panelBg:
-        'bg-[radial-gradient(900px_500px_at_10%_10%,rgba(255,209,102,0.45),transparent_60%),radial-gradient(900px_500px_at_85%_20%,rgba(255,180,162,0.55),transparent_60%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,245,230,0.85))]',
-      title: 'Big signals worth supporting',
-      description:
-        'Your answers suggest strong OCD-like patterns. That can feel exhausting—and it’s also something you can get help with.',
-      nextSteps: [
-        'If you can, book time with a clinician who knows OCD',
-        'Ask about Exposure and Response Prevention (ERP), the gold-standard therapy for OCD',
-        'Consider an OCD support group so you don’t have to do this alone',
-        'Learn from trusted sources like the International OCD Foundation (iocdf.org)',
-        'Be gentle with yourself—recovery is real and common',
-      ],
-    },
-    possible: {
-      icon: Info,
-      iconColor: 'text-white',
-      badgeBg: 'bg-brand-plum',
-      panelBg:
-        'bg-[radial-gradient(900px_500px_at_15%_15%,rgba(233,221,255,0.85),transparent_60%),radial-gradient(900px_500px_at_90%_20%,rgba(255,180,162,0.45),transparent_60%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,245,230,0.80))]',
-      title: 'Some signals to explore',
-      description:
-        'Your answers hint at some OCD-like patterns, though they may overlap with stress or anxiety. Either way, it’s worth exploring with support.',
-      nextSteps: [
-        'Talk to a therapist or counselor if you can',
-        'Track patterns (what shows up, when, and what you do next)',
-        'Learn the difference between OCD and general anxiety',
-        'Try gentle stress-reduction (breathing, movement, grounding)',
-        'If it starts interfering more, reach out sooner rather than later',
-      ],
-    },
-    unlikely: {
-      icon: CheckCircle,
-      iconColor: 'text-white',
-      badgeBg: 'bg-brand-mint',
-      panelBg:
-        'bg-[radial-gradient(900px_500px_at_20%_10%,rgba(185,251,192,0.75),transparent_60%),radial-gradient(900px_500px_at_90%_25%,rgba(255,209,102,0.45),transparent_60%),linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,245,230,0.80))]',
-      title: 'Looks unlikely right now',
-      description:
-        'Based on your answers, OCD doesn’t look likely right now. Intrusive thoughts can happen to anyone—and your concerns are still valid.',
-      nextSteps: [
-        'If you’re still stressed or stuck, talking to someone can help',
-        'You don’t need a diagnosis to deserve support',
-        'Keep your basics steady: sleep, movement, food, connection',
-        'If things change, you can always re-check in',
-        'Share this tool with someone who might benefit',
-      ],
-    },
-  };
+const OUTCOMES = {
+  high: {
+    badge: 'Strong signs',
+    badgeClass: 'bg-brand-grape text-white',
+    title: 'Your answers line up strongly with OCD.',
+    description:
+      'That can feel heavy to read. It also means what you’re dealing with has a name, and OCD responds well to treatment. A lot of people get much better.',
+    nextSteps: [
+      'See a psychiatrist or clinical psychologist, and say the words “I think I might have OCD.”',
+      'Ask whether they offer ERP (Exposure and Response Prevention), the main proven therapy for OCD.',
+      'Not sure where to start? Call Tele-MANAS on 14416 (free) and ask for a referral near you.',
+      'Read about OCD from a trusted source like the International OCD Foundation (iocdf.org).',
+    ],
+  },
+  possible: {
+    badge: 'Some signs',
+    badgeClass: 'bg-brand-plum text-white',
+    title: 'Some of your answers point toward OCD.',
+    description:
+      'They could also overlap with anxiety or stress. Either way, it’s worth talking it through with someone trained to tell the difference.',
+    nextSteps: [
+      'Talk to a counsellor, psychologist or psychiatrist about what you noticed here.',
+      'For a week, jot down what thought showed up, when, and what you did next. Take it to the appointment.',
+      'Learn how OCD differs from general anxiety (iocdf.org is a good start).',
+      'If it starts taking more of your day, reach out sooner rather than later.',
+    ],
+  },
+  unlikely: {
+    badge: 'Few signs',
+    badgeClass: 'bg-brand-mint text-brand-ink',
+    title: 'Your answers don’t point strongly to OCD right now.',
+    description:
+      'Unwanted thoughts happen to almost everyone. If something is still bothering you, that’s real, and you don’t need a diagnosis to deserve support.',
+    nextSteps: [
+      'If you still feel stuck or stressed, talking to someone can help.',
+      'Keep the basics steady: sleep, movement, food and people.',
+      'If things change over the coming weeks, you can check in again then.',
+    ],
+  },
+} as const;
 
-  const config = outcomeConfig[outcome];
-  const Icon = config.icon;
+export default function Results({ answers }: ResultsProps) {
+  const { outcome, themes, rituals, fit } = calculateResult(answers);
+  const config = OUTCOMES[outcome];
+  const themeText = listJoin(themes.map((t) => THEME_LABELS[t]));
+  const hasHiddenRituals = rituals.some((r) => MENTAL_RITUALS.includes(r));
+  const showPattern = outcome !== 'unlikely' && (themes.length > 0 || hasHiddenRituals || fit === 'realistic');
 
   return (
-    <div className="min-h-screen app-bg px-4 py-12">
-      <Confetti enabled />
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Mascot size={56} className="animate-none" />
-            <div>
-              <div className="text-sm font-semibold text-brand-ink/70">Lesson complete</div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-brand-plum" />
-                <span className="font-semibold text-brand-ink">Nice work showing up for yourself.</span>
+    <Layout footerHelplines={false}>
+      <div className="px-4 py-8 md:py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="card p-7 md:p-10">
+            <span className={['pill', config.badgeClass].join(' ')}>{config.badge}</span>
+            <h1 className="mt-4 text-3xl md:text-4xl font-bold leading-tight text-brand-ink">{config.title}</h1>
+            <p className="mt-4 text-lg leading-relaxed text-brand-ink/80">{config.description}</p>
+
+            {showPattern && (
+              <div className="mt-6 space-y-2 rounded-2xl bg-brand-lavender/50 p-5 text-brand-ink/85">
+                {themes.length > 0 && (
+                  <p>
+                    <strong className="text-brand-ink">What you described</strong> fits the {themeText}{' '}
+                    {themes.length === 1 ? 'theme' : 'themes'} of OCD. Worth naming when you talk to someone.
+                  </p>
+                )}
+                {hasHiddenRituals && (
+                  <p>
+                    Things like reassurance-seeking, replaying things in your head or avoiding triggers are compulsions
+                    too, even though nobody can see them.
+                  </p>
+                )}
+                {fit === 'realistic' && (
+                  <p>
+                    You said these feel like realistic worries about your life. That can point more toward anxiety than
+                    OCD, so mention it to whoever you speak to.
+                  </p>
+                )}
               </div>
-            </div>
-          </div>
+            )}
 
-          <div className="pill bg-white/70 text-brand-ink border border-white/60 shadow-softSm">
-            <span aria-hidden>🏁</span> Score {totalScore}/{maxScore} ({scorePct}%)
-          </div>
-        </div>
-
-        <div className={['card-subtle p-7 md:p-10', config.panelBg].join(' ')}>
-          <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-            <div>
-              <div className={['pill text-white shadow-softSm', config.badgeBg].join(' ')}>
-                <Icon className="h-4 w-4" />
-                Your result
-              </div>
-              <h1 className="mt-4 text-3xl md:text-5xl font-bold text-brand-ink">{config.title}</h1>
-              <p className="mt-4 text-lg leading-relaxed text-brand-ink/80">{config.description}</p>
-            </div>
-
-            <div className="md:pt-2">
-              <div className="card p-5">
-                <div className="text-sm font-semibold text-brand-ink/75">Calm XP</div>
-                <div className="mt-2 xp-track">
-                  <div className="xp-fill" style={{ width: `${scorePct}%` }} />
-                </div>
-                <div className="mt-2 text-xs text-brand-ink/60">A little progress is still progress.</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-7 card p-6">
-            <h2 className="text-xl md:text-2xl font-bold text-brand-ink">Next steps (pick one tiny thing)</h2>
-            <ul className="mt-4 space-y-3">
+            <h2 className="mt-8 text-xl font-bold text-brand-ink">What you can do next</h2>
+            <ol className="mt-4 space-y-3">
               {config.nextSteps.map((step, index) => (
                 <li key={index} className="flex gap-3">
-                  <span className="pill bg-white/70 text-brand-ink border border-white/60 shadow-softSm">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-lavender text-sm font-bold text-brand-grape">
                     {index + 1}
                   </span>
-                  <span className="text-brand-ink/80">{step}</span>
+                  <span className="pt-0.5 text-brand-ink/85">{step}</span>
                 </li>
               ))}
-            </ul>
+            </ol>
           </div>
-        </div>
 
-        <div className="mt-7 card p-7 text-center">
-          <p className="text-brand-ink/75">
-            <strong className="text-brand-ink">Important:</strong> This assessment isn’t a diagnosis. Only a qualified mental
-            health professional can diagnose OCD. If you’re struggling, please reach out for support.
-          </p>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <button onClick={onRestart} className="btn-primary">
-              Take it again
-              <span aria-hidden>↺</span>
-            </button>
-            {onHabits && (
-              <button onClick={onHabits} className="btn-secondary">
-                Start a tiny streak
-                <span aria-hidden>🔥</span>
+          <div className="card-subtle mt-6 p-6 md:p-7">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex gap-3">
+                <Hourglass className="mt-1 h-5 w-5 shrink-0 text-brand-plum" aria-hidden />
+                <div>
+                  <p className="font-bold text-brand-ink">When an urge hits: try a pause</p>
+                  <p className="text-brand-ink/75">A short timer that helps you sit with an urge instead of acting on it.</p>
+                </div>
+              </div>
+              <button onClick={() => go('pause')} className="btn-secondary shrink-0">
+                Try it
+                <ArrowRight className="h-4 w-4" />
               </button>
-            )}
+            </div>
           </div>
-        </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-brand-ink/60">
-            Crisis support: Call 988 (Suicide &amp; Crisis Lifeline) or text “HELLO” to 741741 (Crisis Text Line)
-          </p>
+          <div className="mt-6 rounded-bubble border border-brand-ink/10 bg-white/60 p-6">
+            <p className="text-brand-ink/80">
+              <strong className="text-brand-ink">This isn’t a diagnosis.</strong> Only a qualified mental health
+              professional can diagnose OCD. There’s no need to retake this to double-check. Your answers won’t change
+              much from day to day, so take this result to someone who can help.
+            </p>
+            <Helplines className="mt-3" />
+          </div>
+
+          <div className="mt-6 text-center">
+            <button onClick={() => go('story')} className="btn-ghost">
+              Read the story behind ClarityOCD
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

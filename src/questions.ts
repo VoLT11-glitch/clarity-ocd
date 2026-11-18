@@ -1,97 +1,178 @@
 import { Question } from './types';
 
+/*
+  Question design (v1.2)
+  ----------------------
+  Original wording, structured after how clinicians actually screen for OCD:
+
+  1. WHAT shows up (multi-select) — the four OCD dimensions from the DOCS
+     (contamination, harm/responsibility, unacceptable thoughts, symmetry),
+     plus doubt/moral themes and "magical" rules that common tests miss.
+  2. WHAT YOU DO about it (multi-select) — includes mental and invisible
+     compulsions (reviewing, reassurance, praying, avoiding). Online tests that
+     only ask about washing/checking miss "Pure O" OCD.
+  3. HOW MUCH it costs (5 items, 0–4) — the DOCS / Y-BOCS severity parameters:
+     time, distress, interference, avoidance, and difficulty resisting.
+     Time anchors match the Y-BOCS (<1h, 1–3h, 3–8h, >8h).
+  4. DOES IT FEEL UNWANTED — the key difference between OCD and general
+     anxiety. Not scored; it changes the wording of the result.
+
+  Insight is no longer scored: in DSM-5 it's a specifier, not a severity measure.
+  This is a screen, not a validated instrument and not a diagnosis.
+*/
+
 export const questions: Question[] = [
   {
-    id: 1,
-    text: "Do you ever get thoughts that pop into your head and feel really hard to shake—even when you’re trying to move on with your day?",
+    id: 'themes',
+    kind: 'multi',
+    text: 'Do any of these keep coming back to you, even when you don’t want them to?',
+    hint: 'Pick all that fit.',
     options: [
-      { text: "Not really", score: 0 },
-      { text: "Once in a while", score: 1 },
-      { text: "Pretty often", score: 2 },
-      { text: "Almost all the time", score: 3 },
+      { id: 'contamination', label: 'Feeling dirty or contaminated, or fear of germs, illness or spreading something' },
+      { id: 'harm', label: 'Fear that something bad will happen because of you, like a fire, a break-in or someone getting hurt' },
+      { id: 'taboo', label: 'Disturbing thoughts or images that go against who you are: violent, sexual or religious' },
+      { id: 'justright', label: 'Needing things even, in order, or redone until they feel “just right”' },
+      { id: 'doubt', label: 'Constant doubt about your relationship, your sexuality, or whether you’re a good person' },
+      { id: 'magical', label: 'A sense that doing something a certain way will stop something bad from happening' },
+      { id: 'none', label: 'None of these', exclusive: true },
     ],
   },
   {
-    id: 2,
-    text: "When those thoughts show up, how much do they stress you out or make you anxious?",
+    id: 'rituals',
+    kind: 'multi',
+    text: 'When those thoughts show up, do you do any of these to feel okay again?',
+    hint: 'Pick all that fit. The ones in your head count too.',
     options: [
-      { text: "They don’t really bother me", score: 0 },
-      { text: "A little", score: 1 },
-      { text: "Quite a bit", score: 2 },
-      { text: "A lot (it can feel overwhelming)", score: 3 },
+      { id: 'checking', label: 'Checking: locks, the stove, messages, your body, things you said' },
+      { id: 'washing', label: 'Washing or cleaning more than you need to' },
+      { id: 'repeating', label: 'Repeating, counting, tapping or redoing things' },
+      { id: 'reassurance', label: 'Asking people, or Google, to make sure everything is okay' },
+      { id: 'mental', label: 'Going over it in your head: replaying, analysing, or “cancelling” a bad thought' },
+      { id: 'praying', label: 'Praying or saying words a certain way to undo a thought' },
+      { id: 'avoiding', label: 'Staying away from places, people or things that set it off' },
+      { id: 'none', label: 'None of these', exclusive: true },
     ],
   },
   {
-    id: 3,
-    text: "Do you ever feel like you have to do certain things to feel okay again—like checking, repeating, asking for reassurance, or going over something in your mind?",
+    id: 'time',
+    kind: 'single',
+    scored: true,
+    text: 'On a typical day, how much time do these thoughts, and the things you do about them, take up?',
     options: [
-      { text: "Nope", score: 0 },
-      { text: "Sometimes", score: 1 },
-      { text: "Often", score: 2 },
-      { text: "Most of the time", score: 3 },
+      { id: 't0', label: 'None', score: 0 },
+      { id: 't1', label: 'Less than 1 hour', score: 1 },
+      { id: 't2', label: '1 to 3 hours', score: 2 },
+      { id: 't3', label: '3 to 8 hours', score: 3 },
+      { id: 't4', label: 'More than 8 hours', score: 4 },
     ],
   },
   {
-    id: 4,
-    text: "About how much time does this take up in a day—either the thoughts themselves, or the things you do to calm down or feel certain?",
+    id: 'distress',
+    kind: 'single',
+    scored: true,
+    text: 'How upsetting are the thoughts, or the feeling when you can’t do the thing that calms them?',
     options: [
-      { text: "Less than 30 minutes", score: 0 },
-      { text: "30 minutes to 1 hour", score: 1 },
-      { text: "1–3 hours", score: 2 },
-      { text: "More than 3 hours", score: 3 },
+      { id: 'd0', label: 'Not at all', score: 0 },
+      { id: 'd1', label: 'A little', score: 1 },
+      { id: 'd2', label: 'Upsetting, but I can manage', score: 2 },
+      { id: 'd3', label: 'Very upsetting', score: 3 },
+      { id: 'd4', label: 'Overwhelming, almost all the time', score: 4 },
     ],
   },
   {
-    id: 5,
-    text: "Does this get in the way of your day—school/work, relationships, or just being able to relax and enjoy things?",
+    id: 'interference',
+    kind: 'single',
+    scored: true,
+    text: 'How much does this get in the way of your studies, work, sleep or relationships?',
     options: [
-      { text: "Not at all", score: 0 },
-      { text: "A little", score: 1 },
-      { text: "Quite a bit", score: 2 },
-      { text: "A lot", score: 3 },
+      { id: 'i0', label: 'Not at all', score: 0 },
+      { id: 'i1', label: 'A little', score: 1 },
+      { id: 'i2', label: 'Clearly, but I still manage', score: 2 },
+      { id: 'i3', label: 'A lot', score: 3 },
+      { id: 'i4', label: 'It stops me doing things I need to do', score: 4 },
     ],
   },
   {
-    id: 6,
-    text: "When it’s happening, can you tell it might be more than the situation calls for—or does it feel completely necessary in the moment?",
+    id: 'avoidance',
+    kind: 'single',
+    scored: true,
+    text: 'How much do you avoid places, people or situations because they might set this off?',
     options: [
-      { text: "This doesn’t really happen for me", score: 0 },
-      { text: "Yeah, I can tell it’s more than the situation calls for", score: 2 },
-      { text: "Sometimes I can tell, sometimes I can’t", score: 2 },
-      { text: "In the moment it feels completely necessary", score: 1 },
+      { id: 'a0', label: 'Not at all', score: 0 },
+      { id: 'a1', label: 'A little', score: 1 },
+      { id: 'a2', label: 'Some, it changes my plans sometimes', score: 2 },
+      { id: 'a3', label: 'A lot', score: 3 },
+      { id: 'a4', label: 'I avoid so much my life feels smaller', score: 4 },
     ],
   },
   {
-    id: 7,
-    text: "Do you ever avoid certain places, people, or situations because you worry it’ll set this off again?",
+    id: 'resist',
+    kind: 'single',
+    scored: true,
+    text: 'When the urge comes, how hard is it to not act on it, or to stop going over it in your head?',
     options: [
-      { text: "Never", score: 0 },
-      { text: "Rarely", score: 1 },
-      { text: "Often", score: 2 },
-      { text: "Almost always", score: 3 },
+      { id: 'r0', label: 'Easy, or I don’t get urges like this', score: 0 },
+      { id: 'r1', label: 'Usually manageable', score: 1 },
+      { id: 'r2', label: 'Hard', score: 2 },
+      { id: 'r3', label: 'Very hard', score: 3 },
+      { id: 'r4', label: 'It feels impossible', score: 4 },
     ],
   },
   {
-    id: 8,
-    text: "When a worry shows up, how hard is it to let it be there without doing something to get rid of the feeling?",
+    id: 'fit',
+    kind: 'single',
+    text: 'Which sounds most like these thoughts?',
     options: [
-      { text: "Not really an issue for me", score: 0 },
-      { text: "I can usually let it go", score: 1 },
-      { text: "It’s pretty hard", score: 2 },
-      { text: "It feels nearly impossible", score: 3 },
+      { id: 'unwanted', label: 'They feel unwanted or out of character, like they don’t match who I am' },
+      { id: 'mixed', label: 'A bit of both' },
+      { id: 'realistic', label: 'They’re realistic worries about real things in my life (money, exams, health)' },
+      { id: 'unsure', label: 'I’m not sure' },
     ],
   },
 ];
 
-export function calculateResult(answers: number[]): { outcome: 'high' | 'possible' | 'unlikely'; totalScore: number } {
-  const totalScore = answers.reduce((sum, score) => sum + score, 0);
-  const maxScore = questions.length * 3;
+export const THEME_LABELS: Record<string, string> = {
+  contamination: 'contamination',
+  harm: 'responsibility for harm',
+  taboo: 'unwanted taboo thoughts',
+  justright: '“just right” and symmetry',
+  doubt: 'doubt (relationships, identity, morals)',
+  magical: 'magical rules',
+};
 
-  if (totalScore >= maxScore * 0.6) {
-    return { outcome: 'high', totalScore };
-  } else if (totalScore >= maxScore * 0.35) {
-    return { outcome: 'possible', totalScore };
-  } else {
-    return { outcome: 'unlikely', totalScore };
-  }
+export const MENTAL_RITUALS = ['reassurance', 'mental', 'praying', 'avoiding'];
+
+export type Answers = Record<string, string[]>;
+
+export type Outcome = 'high' | 'possible' | 'unlikely';
+
+export function calculateResult(answers: Answers): {
+  outcome: Outcome;
+  severity: number;
+  themes: string[];
+  rituals: string[];
+  fit: string | undefined;
+} {
+  const pick = (id: string) => answers[id] ?? [];
+  const themes = pick('themes').filter((t) => t !== 'none');
+  const rituals = pick('rituals').filter((r) => r !== 'none');
+
+  const scoreOf = (id: string) => {
+    const q = questions.find((x) => x.id === id);
+    const opt = q?.options.find((o) => o.id === pick(id)[0]);
+    return opt?.score ?? 0;
+  };
+  const severity = questions.filter((q) => q.scored).reduce((sum, q) => sum + scoreOf(q.id), 0); // 0–20
+
+  // DSM-5 criterion A: obsessions and/or compulsions present.
+  const present = themes.length > 0 || rituals.length > 0;
+  // DSM-5 criterion B: time-consuming (≥1 hr/day) or real distress or impairment.
+  const significant = scoreOf('time') >= 2 || scoreOf('distress') >= 3 || scoreOf('interference') >= 2;
+
+  let outcome: Outcome = 'unlikely';
+  // 8/20 mirrors the DOCS-SF screening cut-off (16/40).
+  if (present && significant && severity >= 8) outcome = 'high';
+  else if (present && (severity >= 6 || significant)) outcome = 'possible';
+
+  return { outcome, severity, themes, rituals, fit: pick('fit')[0] };
 }

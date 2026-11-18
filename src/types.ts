@@ -1,14 +1,17 @@
-export interface Question {
-  id: number;
-  text: string;
-  options: {
-    text: string;
-    score: number;
-  }[];
+export interface QuestionOption {
+  id: string;
+  label: string;
+  score?: number;
+  /** Selecting this clears the others (e.g. "None of these"). */
+  exclusive?: boolean;
 }
 
-export interface AssessmentResult {
-  totalScore: number;
-  outcome: 'high' | 'possible' | 'unlikely';
-  answers: number[];
+export interface Question {
+  id: string;
+  kind: 'single' | 'multi';
+  text: string;
+  hint?: string;
+  /** Counts toward the severity score. */
+  scored?: boolean;
+  options: QuestionOption[];
 }
